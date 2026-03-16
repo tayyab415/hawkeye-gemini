@@ -1,0 +1,144 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 700" width="100%" height="100%" style="background-color: #0d1117; font-family: 'Inter', system-ui, sans-serif;">
+  <defs>
+    <!-- Arrowhead markers -->
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#00d4ff" />
+    </marker>
+    <marker id="arrow-bi" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#ffaa00" />
+    </marker>
+    
+    <!-- Gradients -->
+    <linearGradient id="bg-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#161b22"/>
+      <stop offset="100%" stop-color="#0d1117"/>
+    </linearGradient>
+    <linearGradient id="agent-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1f2937"/>
+      <stop offset="100%" stop-color="#111827"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1000" height="700" fill="url(#bg-grad)" />
+  
+  <text x="500" y="40" font-size="24" font-weight="bold" fill="#ffffff" text-anchor="middle" letter-spacing="2">HAWK EYE SYSTEM ARCHITECTURE</text>
+  <text x="500" y="60" font-size="12" fill="#8b949e" text-anchor="middle">Agentic Disaster Response Network Powered By Google</text>
+
+  <!-- USER / UI SECTION (Left) -->
+  <g transform="translate(40, 200)">
+    <rect width="220" height="280" rx="8" fill="#161b22" stroke="#30363d" stroke-width="2" />
+    <text x="110" y="30" font-size="16" font-weight="bold" fill="#c9d1d9" text-anchor="middle">Operator / UI</text>
+    
+    <rect x="20" y="60" width="180" height="60" rx="4" fill="#21262d" stroke="#8b949e" />
+    <text x="110" y="90" font-size="14" font-weight="bold" fill="#00d4ff" text-anchor="middle">Commander</text>
+    <text x="110" y="108" font-size="11" fill="#8b949e" text-anchor="middle">(Voice / Audio)</text>
+
+    <rect x="20" y="140" width="180" height="100" rx="4" fill="#21262d" stroke="#58a6ff" />
+    <text x="110" y="170" font-size="14" font-weight="bold" fill="#58a6ff" text-anchor="middle">Mission Control</text>
+    <text x="110" y="190" font-size="12" fill="#8b949e" text-anchor="middle">(React Vite App)</text>
+    <text x="110" y="210" font-size="11" fill="#8b949e" text-anchor="middle">CesiumJS / 3D Tiles</text>
+  </g>
+
+  <!-- FASTAPI / WEBSOCKET BRIDGE -->
+  <g transform="translate(320, 290)">
+    <rect width="120" height="100" rx="8" fill="#161b22" stroke="#ffaa00" stroke-width="2" stroke-dasharray="5,5" />
+    <text x="60" y="40" font-size="14" font-weight="bold" fill="#ffaa00" text-anchor="middle">FastAPI</text>
+    <text x="60" y="60" font-size="12" fill="#8b949e" text-anchor="middle">WebSocket</text>
+    <text x="60" y="80" font-size="11" fill="#8b949e" text-anchor="middle">Event Router</text>
+  </g>
+
+  <!-- CONNECTIONS LEFT TO MIDDLE -->
+  <path d="M 260 250 L 320 250 L 320 310" fill="none" stroke="#ffaa00" stroke-width="2" marker-end="url(#arrow-bi)" />
+  <path d="M 260 340 L 320 340" fill="none" stroke="#ffaa00" stroke-width="2" marker-end="url(#arrow-bi)" />
+
+  <text x="290" y="240" font-size="10" fill="#ffaa00" text-anchor="middle">Audio</text>
+  <text x="290" y="330" font-size="10" fill="#ffaa00" text-anchor="middle">Events</text>
+
+  <!-- GEMINI LIVE API -->
+  <g transform="translate(500, 100)">
+    <rect width="200" height="80" rx="8" fill="#161b22" stroke="#a371f7" stroke-width="3" />
+    <text x="100" y="35" font-size="16" font-weight="bold" fill="#a371f7" text-anchor="middle">Gemini Live API</text>
+    <text x="100" y="55" font-size="12" fill="#c9d1d9" text-anchor="middle">Multimodal Stream</text>
+  </g>
+  
+  <!-- CONNECTION WS -> GEMINI -->
+  <path d="M 380 290 L 380 140 L 500 140" fill="none" stroke="#a371f7" stroke-width="2" marker-end="url(#arrow)" />
+  <text x="440" y="130" font-size="10" fill="#a371f7" text-anchor="middle">Audio Input</text>
+
+  <!-- ADK AGENT SYSTEM (Middle-Right) -->
+  <g transform="translate(500, 220)">
+    <rect width="460" height="240" rx="8" fill="url(#agent-grad)" stroke="#3fb950" stroke-width="3" />
+    <text x="230" y="30" font-size="16" font-weight="bold" fill="#3fb950" text-anchor="middle">Agent Development Kit (ADK) Runtime</text>
+    
+    <rect x="130" y="50" width="200" height="40" rx="4" fill="#2ea043" />
+    <text x="230" y="75" font-size="14" font-weight="bold" fill="#ffffff" text-anchor="middle">Coordinator (Root Agent)</text>
+
+    <!-- Sub Agents -->
+    <rect x="20" y="120" width="130" height="40" rx="4" fill="#21262d" stroke="#3fb950" />
+    <text x="85" y="145" font-size="13" font-weight="bold" fill="#c9d1d9" text-anchor="middle">Perception</text>
+
+    <rect x="165" y="120" width="130" height="40" rx="4" fill="#21262d" stroke="#3fb950" />
+    <text x="230" y="145" font-size="13" font-weight="bold" fill="#c9d1d9" text-anchor="middle">Analyst</text>
+
+    <rect x="310" y="120" width="130" height="40" rx="4" fill="#21262d" stroke="#3fb950" />
+    <text x="375" y="145" font-size="13" font-weight="bold" fill="#c9d1d9" text-anchor="middle">Predictor</text>
+
+    <rect x="165" y="180" width="130" height="40" rx="4" fill="#21262d" stroke="#3fb950" />
+    <text x="230" y="205" font-size="13" font-weight="bold" fill="#c9d1d9" text-anchor="middle">Action</text>
+
+    <!-- Internal Lines -->
+    <path d="M 230 90 L 85 120" fill="none" stroke="#8b949e" stroke-width="1" />
+    <path d="M 230 90 L 230 120" fill="none" stroke="#8b949e" stroke-width="1" />
+    <path d="M 230 90 L 375 120" fill="none" stroke="#8b949e" stroke-width="1" />
+    <path d="M 230 90 L 230 180" fill="none" stroke="#8b949e" stroke-width="1" />
+  </g>
+
+  <!-- CONNECTION GEMINI -> ADK -->
+  <path d="M 600 180 L 600 220" fill="none" stroke="#a371f7" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- CONNECTION ADK -> WS -->
+  <path d="M 500 340 L 440 340" fill="none" stroke="#00d4ff" stroke-width="2" marker-end="url(#arrow)" />
+  <text x="470" y="330" font-size="10" fill="#00d4ff" text-anchor="middle">Tool Call</text>
+  <text x="470" y="355" font-size="10" fill="#00d4ff" text-anchor="middle">Results / Events</text>
+
+  <!-- GOOGLE SERVICES / TOOLS (Bottom) -->
+  <g transform="translate(100, 520)">
+    <rect width="800" height="140" rx="8" fill="#161b22" stroke="#30363d" stroke-width="2" />
+    <text x="400" y="30" font-size="16" font-weight="bold" fill="#c9d1d9" text-anchor="middle">External Services & Tools</text>
+
+    <!-- Services boxes -->
+    <rect x="30" y="50" width="100" height="60" rx="4" fill="#21262d" stroke="#d29922" />
+    <text x="80" y="75" font-size="12" font-weight="bold" fill="#d29922" text-anchor="middle">BigQuery</text>
+    <text x="80" y="95" font-size="10" fill="#8b949e" text-anchor="middle">(Telemetry)</text>
+
+    <rect x="150" y="50" width="110" height="60" rx="4" fill="#21262d" stroke="#00d4ff" />
+    <text x="205" y="75" font-size="12" font-weight="bold" fill="#00d4ff" text-anchor="middle">Earth Engine</text>
+    <text x="205" y="95" font-size="10" fill="#8b949e" text-anchor="middle">(Satellite SAR)</text>
+
+    <rect x="280" y="50" width="100" height="60" rx="4" fill="#21262d" stroke="#3fb950" />
+    <text x="330" y="75" font-size="12" font-weight="bold" fill="#3fb950" text-anchor="middle">Maps / Routes</text>
+    <text x="330" y="95" font-size="10" fill="#8b949e" text-anchor="middle">(Evacuation)</text>
+
+    <rect x="400" y="50" width="100" height="60" rx="4" fill="#21262d" stroke="#f85149" />
+    <text x="450" y="75" font-size="12" font-weight="bold" fill="#f85149" text-anchor="middle">Gmail</text>
+    <text x="450" y="95" font-size="10" fill="#8b949e" text-anchor="middle">(Emergency)</text>
+
+    <rect x="520" y="50" width="110" height="60" rx="4" fill="#21262d" stroke="#ffaa00" />
+    <text x="575" y="75" font-size="12" font-weight="bold" fill="#ffaa00" text-anchor="middle">Firestore DB</text>
+    <text x="575" y="95" font-size="10" fill="#8b949e" text-anchor="middle">(Context State)</text>
+
+    <rect x="650" y="50" width="120" height="60" rx="4" fill="#21262d" stroke="#a371f7" />
+    <text x="710" y="75" font-size="12" font-weight="bold" fill="#a371f7" text-anchor="middle">Nano Banana 2</text>
+    <text x="710" y="95" font-size="10" fill="#8b949e" text-anchor="middle">(Prediction Model)</text>
+  </g>
+
+  <!-- TOOL CONNECTIONS (ADK to Services) -->
+  <path d="M 585 460 L 585 520" fill="none" stroke="#8b949e" stroke-width="2" stroke-dasharray="4,4" marker-end="url(#arrow)" />
+  <path d="M 665 460 L 665 520" fill="none" stroke="#8b949e" stroke-width="2" stroke-dasharray="4,4" marker-end="url(#arrow)" />
+  <path d="M 730 460 L 730 520" fill="none" stroke="#8b949e" stroke-width="2" stroke-dasharray="4,4" marker-end="url(#arrow)" />
+  <path d="M 810 460 L 810 520" fill="none" stroke="#8b949e" stroke-width="2" stroke-dasharray="4,4" marker-end="url(#arrow)" />
+
+  <text x="730" y="490" font-size="11" fill="#c9d1d9" text-anchor="middle" background-color="#0d1117">Tool Execution API Calls</text>
+
+</svg>

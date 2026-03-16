@@ -1,0 +1,269 @@
+═══════════════════════════════════════════════════════════════════════════════
+                         DESIGN AUDIT COMPLETION REPORT
+                  TODO: design-ee-runtime-contract [COMPLETE]
+═══════════════════════════════════════════════════════════════════════════════
+
+✅ TASK STATUS: FULLY COMPLETED (Design/Specification Phase)
+
+DELIVERABLES:
+  1. EE_RUNTIME_AUDIT.md (26 KB, 782 lines)
+     - Current state deep-dive + gap analysis
+     - Location: /hawkeye/EE_RUNTIME_AUDIT.md
+
+  2. EE_RUNTIME_CONTRACT_DESIGN.md (32 KB, 960 lines) [MAIN DELIVERABLE]
+     - Implementation-ready specification with exact touchpoints
+     - File-by-file change plan (8 files, 27 hours effort)
+     - Event contract (REST + WebSocket payload schemas)
+     - Risk mitigation & backward compatibility analysis
+     - Location: /hawkeye/EE_RUNTIME_CONTRACT_DESIGN.md
+
+  3. EE_RUNTIME_QUICK_REFERENCE.md (8.2 KB)
+     - Developer cheat sheet & implementation checklist
+     - 4-week development roadmap
+     - Success criteria checklist
+     - Location: /hawkeye/EE_RUNTIME_QUICK_REFERENCE.md
+
+═══════════════════════════════════════════════════════════════════════════════
+
+AUDIT FINDINGS:
+
+Current State (AS-IS):
+  ├─ Backend: Static file loader (earth_engine_service.py)
+  ├─ Tools: Dual source (BigQuery live, EE static)
+  ├─ WebSocket: Sparse ee_update events
+  ├─ Frontend: Static GeoJSON imports (bypasses API)
+  └─ Status: "Live" only for BigQuery; EE is pre-computed
+
+What's Live:      Infrastructure queries (BigQuery) + Historical floods (BigQuery)
+What's Static:    Flood geometry + Growth rate (12%/hr) + Population density + Provenance
+What's Missing:   Live EE computation + Raster tiles + Temporal frames + Confidence metadata
+
+Proposed State (POST-IMPLEMENTATION):
+  ├─ Backend: Async EE API calls + task polling + tile URL generation
+  ├─ Tools: Dual-mode get_flood_extent() (live_mode flag)
+  ├─ WebSocket: Rich streaming events (phase, progress, tiles, provenance)
+  ├─ Frontend: Dynamic raster layer management + temporal support
+  └─ Status: True EE-first runtime with static fallback
+
+═══════════════════════════════════════════════════════════════════════════════
+
+FILES REQUIRING MODIFICATION (8 Total):
+
+TIER 1 - Backend Service & API (CRITICAL PATH):
+  ☐ app/services/earth_engine_service.py
+    └─ Add: async submit_flood_analysis(), get_analysis_status(), get_analysis_result()
+       Est. 100 lines new | Effort: 6h
+
+  ☐ app/main.py
+    └─ Add: POST /api/earth-engine/analyze, GET /api/earth-engine/tasks/*, polling task
+       Est. 150 lines new | Effort: 4h
+
+TIER 2 - Tool Enhancement:
+  ☐ app/hawkeye_agent/tools/analyst.py
+    └─ Update: get_flood_extent() with live_mode flag
+       Est. 50 lines modified | Effort: 1.5h
+
+TIER 3 - Frontend Messages & UI:
+  ☐ frontend/src/types/messages.js
+    └─ Add: EE_ANALYSIS_START, UPDATE, COMPLETE + new MAP_ACTIONS
+       Est. 20 lines | Effort: 1h
+
+  ☐ frontend/src/App.jsx
+    └─ Add: Event handlers for ee_analysis_* + progress state
+       Est. 80 lines | Effort: 2h
+
+  ☐ frontend/src/components/EarthEnginePanel.jsx
+    └─ Add: Run button + progress UI
+       Est. 30 lines | Effort: 1.5h
+
+  ☐ frontend/src/components/strategic/DataLayerPanel.jsx
+    └─ Add: Raster layer management methods
+       Est. 80 lines | Effort: 2h
+
+  ☐ frontend/src/components/CesiumGlobe.jsx
+    └─ Add: Raster rendering + tile commands
+       Est. 100 lines | Effort: 2h
+
+TIER 4 - Type Safety:
+  ☐ Pydantic models in app/main.py
+    └─ Add: EEAnalysisRequest, EETaskStatus
+       Est. 30 lines | Effort: 1h
+
+TIER 5 - Testing:
+  ☐ Unit & Integration Tests
+    └─ Service, tools, events, end-to-end
+       Effort: 7h
+
+Total Effort: ~27 hours (backend-heavy, can parallelize frontend)
+Critical Path: Tier 1 → Tier 2 → Event routing
+
+═══════════════════════════════════════════════════════════════════════════════
+
+EVENT CONTRACT SPECIFICATION:
+
+HTTP REST Endpoints:
+  POST   /api/earth-engine/analyze              → { task_id, status: "queued", ... }
+  GET    /api/earth-engine/tasks/{task_id}      → { status, progress_pct, phase, ... }
+  GET    /api/earth-engine/tasks/{task_id}/result → { provenance, geometry, tiles, metrics }
+  GET    /api/earth-engine/tiles/{task_id}/{layer}/{z}/{x}/{y}.png → PNG tile
+
+WebSocket Events (NEW):
+  Emit:   ee_analysis_start { type, parameters }
+  Recv:   ee_analysis_update { type, task_id, phase, progress_pct, message }
+  Recv:   ee_analysis_complete { type, task_id, analysis_provenance, geometry, tiles, metrics, map_actions }
+
+Payload Schema Examples:
+  SUBMIT:
+    { "analysis_type": "flood_extent",
+      "parameters": { "baseline_window": ["2025-06-01", "2025-09-30"],
+                      "event_window": ["2026-01-01", "2026-02-28"],
+                      "dataset": "COPERNICUS/S1_GRD", "threshold_db": -3.0 } }
+
+  RESULT:
+    { "analysis_provenance": { /* detailed metadata */ },
+      "geometry": { /* GeoJSON FeatureCollection */ },
+      "tiles": { "change_detection": { "url": "...", "style": {...} }, ... },
+      "metrics": { "flood_area_sqkm": 1.56, "growth_rate_estimate": {...}, ... } }
+
+═══════════════════════════════════════════════════════════════════════════════
+
+KEY IMPLEMENTATION DECISIONS:
+
+├─ Async Pattern: asyncio (non-blocking task polling)
+├─ Tile Caching: Hybrid (live from EE + local fallback)
+├─ Task TTL: 1 hour (reasonable cleanup window)
+├─ Fallback: Static data (zero downtime if EE unavailable)
+├─ Auth: Environment variables (GOOGLE_APPLICATION_CREDENTIALS)
+├─ Rate Limiting: Exponential backoff (1s, 2s, 4s, 8s, 16s)
+└─ Backward Compat: Keep ee_update message for old clients
+
+═══════════════════════════════════════════════════════════════════════════════
+
+RISK MITIGATION:
+
+Risk                        Mitigation
+─────────────────────────────────────────────────────────────────────
+EE API downtime             → Fallback to static data
+Network interruption        → WebSocket reconnect resumes from task_id
+Task expiration             → 1-hour TTL cache + restart capability
+Auth failure                → Logged warning + static-only mode
+Slow tile generation        → Exponential backoff on polling
+Backward compatibility      → Keep ee_update event for v1 clients
+
+═══════════════════════════════════════════════════════════════════════════════
+
+SUCCESS CRITERIA (POST-IMPLEMENTATION):
+
+Submission Phase:
+  ✓ User clicks "Run Live Analysis" button
+  ✓ Task submitted to EE, task_id returned
+  ✓ ee_analysis_start event emitted
+
+Polling Phase:
+  ✓ Backend polls every 5 seconds
+  ✓ ee_analysis_update events with progress (0-100%)
+  ✓ Phase labels update (baseline_composite, change_detection, etc.)
+  ✓ Frontend progress bar animates
+
+Completion Phase:
+  ✓ ee_analysis_complete event emitted
+  ✓ GeoJSON vectors render on globe
+  ✓ Raster tiles display as imagery layers
+  ✓ Each tile layer can be toggled independently
+  ✓ Provenance shows "LIVE" status + timestamp
+
+Robustness:
+  ✓ Static data fallback if EE unavailable
+  ✓ WebSocket reconnect resumes from task_id
+  ✓ Old clients (v1) continue working
+  ✓ Graceful error handling, no 500 errors
+
+═══════════════════════════════════════════════════════════════════════════════
+
+INVESTIGATION SCOPE COMPLETED:
+
+✅ Backend Flow (earth_engine_service.py, tools/services, main.py WebSocket)
+   - Identified static data sources (GeoJSON files)
+   - Mapped tool execution path (analyst.py → EarthEngineService → main.py)
+   - Found hardcoded metrics (12% growth, 15,000/km² density)
+   - Located WebSocket emission points (lines 654-660, 984-988)
+
+✅ Frontend Flow (App.jsx, CesiumGlobe.jsx, DataLayerPanel.jsx, messages.js)
+   - Traced WebSocket message handling (useHawkEyeSocket → events array)
+   - Located static GeoJSON imports (bypass API)
+   - Mapped message types (types/messages.js)
+   - Identified rendering pipeline (App → Panel → Globe)
+
+✅ State Seeding/Merging
+   - Static data: flood_extent.geojson, analysis_provenance.json
+   - Mocked data: demoSimulator.js (timeline frames)
+   - Live data: BigQuery queries only
+   - Merge points: App.jsx state management
+
+✅ Event Contract Design
+   - REST endpoints: 4 new (analyze, status, result, tiles)
+   - WebSocket events: 3 new (start, update, complete)
+   - Payload schemas: Full provenance + tile references + metrics
+   - Backward compatibility: Retained ee_update message
+
+✅ File-by-File Change Plan
+   - 8 files total (2 backend services, 5 frontend components, 1 tool)
+   - Exact line numbers provided
+   - Code snippets included
+   - Implementation ordering (TIER 1→2→3→4)
+
+✅ Risk & Compatibility
+   - Network failure mitigation (reconnect logic)
+   - EE downtime fallback (static data)
+   - Backward compatibility (message retention)
+   - Auth failure handling (graceful degradation)
+
+═══════════════════════════════════════════════════════════════════════════════
+
+NEXT STEPS FOR IMPLEMENTATION:
+
+1. Review all 3 design documents
+2. Obtain Earth Engine API credentials
+3. Create feature branch: feature/ee-runtime-first-class
+4. Begin TIER 1 implementation (earth_engine_service.py, app/main.py)
+5. Follow TIER-based priority for incremental value delivery
+
+═══════════════════════════════════════════════════════════════════════════════
+
+VERIFICATION:
+
+✅ No code modifications made (per requirements)
+✅ All backend components audited
+✅ All frontend components audited
+✅ Message contracts fully specified
+✅ Implementation plan concrete & ready
+✅ Risks identified & mitigated
+✅ Success criteria testable & specific
+✅ Backward compatibility maintained
+
+═══════════════════════════════════════════════════════════════════════════════
+
+CONCLUSION:
+
+This design audit and specification is COMPLETE and READY FOR IMPLEMENTATION.
+
+The proposed contract elevates Earth Engine from static files to a true
+first-class runtime component with:
+  • Live EE API computation
+  • Streaming progress updates
+  • Rich raster + vector outputs
+  • Complete provenance & confidence
+  • Graceful static fallback
+  • Full backward compatibility
+
+Estimated delivery: 4-5 weeks (27 hours effort, parallelizable work)
+
+═══════════════════════════════════════════════════════════════════════════════
+
+Document Locations:
+  /hawkeye/EE_RUNTIME_AUDIT.md
+  /hawkeye/EE_RUNTIME_CONTRACT_DESIGN.md
+  /hawkeye/EE_RUNTIME_QUICK_REFERENCE.md
+
+Status: ✅ COMPLETE - Ready for engineering team
+Date: March 16, 2025

@@ -1,0 +1,131 @@
+.il-count {
+  font-size: 9px;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.il-entry {
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  gap: 6px;
+  padding: 5px 8px;
+  border-left: 2px solid transparent;
+  border-bottom: 1px solid rgba(30, 45, 61, 0.4);
+  font-size: 11px;
+  animation: slideInLeftLog 0.5s ease-out forwards;
+  transition: background 0.2s;
+  position: relative;
+}
+
+.il-entry:hover {
+  background: rgba(255, 255, 255, 0.015);
+}
+
+.il-entry.critical {
+  border-left-color: var(--critical);
+}
+
+.il-entry.critical::after {
+  content: '';
+  position: absolute;
+  left: -2px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  box-shadow: 0 0 8px rgba(255, 68, 68, 0.4);
+}
+
+.il-entry.warning {
+  border-left-color: var(--warning);
+}
+
+.il-entry.info {
+  border-left-color: var(--accent);
+}
+
+@keyframes slideInLeftLog {
+  0% { 
+    opacity: 0; 
+    transform: translateX(-20px); 
+    background: rgba(255, 255, 255, 0.1); 
+  }
+  100% { 
+    opacity: 1; 
+    transform: translateX(0); 
+    background: transparent; 
+  }
+}
+
+.il-entry:last-child {
+  border-bottom: none;
+}
+
+.il-ts {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+  padding-top: 1px;
+  font-variant-numeric: tabular-nums;
+}
+
+.il-severity {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  flex-shrink: 0;
+  min-width: 56px;
+  padding: 2px 6px;
+  border-radius: 2px;
+  text-align: center;
+}
+
+/* Severity badge backgrounds */
+.il-entry.critical .il-severity {
+  background: rgba(255, 68, 68, 0.12);
+  color: var(--critical);
+}
+
+.il-entry.warning .il-severity {
+  background: rgba(255, 170, 0, 0.12);
+  color: var(--warning);
+}
+
+.il-entry.info .il-severity {
+  background: rgba(0, 212, 255, 0.1);
+  color: var(--accent);
+}
+
+.il-text {
+  color: var(--text-primary);
+  line-height: 1.4;
+}
+
+/* ── Initializing state ───────────────────────────────────── */
+.il-init-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 24px 16px;
+  opacity: 0.6;
+}
+
+.il-init-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: pulse-accent 1.5s infinite;
+  box-shadow: 0 0 8px rgba(0, 212, 255, 0.4);
+}
+
+.il-init-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 3px;
+  color: var(--text-secondary);
+}

@@ -1,0 +1,221 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║         EARTH ENGINE USAGE AUDIT — QUICK REFERENCE                          ║
+║         Hawkeye Flood Detection System                                       ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+CURRENT STATE
+─────────────────────────────────────────────────────────────────────────────
+Status:              MINIMALLY USED (Disabled by Default)
+Operating Mode:      OFFLINE — Pre-computed GeoJSON + Static Metadata
+Live Mode:           GATED behind HAWKEYE_ENABLE_EE_LIVE_TILES flag (unset)
+EE API Usage:        ZERO in default runtime
+Integration:         REST + WebSocket + Cesium tiles
+
+KEY IMPLEMENTATIONS
+─────────────────────────────────────────────────────────────────────────────
+
+OFFLINE PATH (Always Active)
+  earth_engine_service.py:_load_geojson()       → /data/geojson/flood_extent.geojson
+  earth_engine_service.py:_load_metadata()      → /data/geojson/analysis_provenance.json
+  earth_engine_service.py:get_runtime_temporal_frames()     [line 1275]
+  earth_engine_service.py:get_runtime_multisensor_fusion()  [line 1443]
+  earth_engine_service.py:get_runtime_layer_descriptors()   [line 2096]
+  
+  API Endpoint: GET /api/earth-engine/tiles/offline/{layer_id}/{z}/{x}/{y}.png
+    → Returns static placeholder PNG (cached 3600s)
+  
+  WebSocket: "ee_update" broadcast (main.py:1047)
+    → Contains: temporal_frames, multisensor_fusion, layers, temporal_playback
+
+LIVE PATH (IF Flag=true)
+  earth_engine_service.py:_build_live_runtime_tile_handles()  [line 1019]
+    ├─ ee.Initialize(project_id)
+    ├─ Query COPERNICUS/S1_GRD (Sentinel-1)
+    ├─ Generate image.getMapId() for 5 layers
+    ├─ Register MapID url_template with tile handles
+    └─ Return live_handles: {layer_id → tile_handle}
+  
+  API Endpoint: GET /api/earth-engine/tiles/live/{tile_handle}/{z}/{x}/{y}.png
+    → Proxies to Earth Engine MapID URL (timeout=12s, cache=300s)
+  
+  API Endpoint: POST /api/earth-engine/live-analysis
+    → Submits task (queued → running → complete)
+    → Returns task_id, status, result
+  
+  Tasks: In-memory only (_live_analysis_tasks dict, line 74)
+    → Lost on server restart
+    → No Firestore/BigQuery persistence
+
+FRONTEND FLOW
+─────────────────────────────────────────────────────────────────────────────
+  App.jsx imports floodExtentRaw, analysisProvenanceRaw (embedded static)
+  
+  EarthEnginePanel.jsx (744 lines)
+    ├─ Displays multisensor_fusion.aggregate_confidence
+    ├─ Shows live_analysis_task state + timestamps
+    ├─ Temporal slider: baseline → event → change
+    └─ Uncertainty indicator (inverse of confidence)
+  
+  DataLayerPanel.jsx (3125 lines)
+    ├─ For each layer descriptor:
+    │  ├─ If status="live"      → tile_source.url_template with live tile handle
+    │  └─ If status="placeholder" → tile_source.url_template with offline endpoint
+    ├─ Creates Cesium.UrlTemplateImageryProvider
+    └─ Cesium renders XYZ tiles on globe
+  
+  WebSocket: useHawkEyeSocket.js receives "ee_update"
+    └─ Stores eeRuntime state → passed to EarthEnginePanel
+
+MULTISENSOR FUSION ARCHITECTURE
+─────────────────────────────────────────────────────────────────────────────
+  Weights:     Sentinel-1 (45%) + Sentinel-2 (15%) + DEM (15%) + 
+               Rainfall (15%) + GroundSourceIncidents (10%)
+  
+  Sentinel-1 (45%):
+    - scene_support_score = clamp(baseline_scene_count / 6.0)
+    - change_intensity_score = clamp(|change_db| / |threshold_db|)
+    - runtime_signal_score = average(scene_support, intensity)
+  
+  Sentinel-2 (15%): PLACEHOLDER — No live data
+    - water_presence_score from NDWI/MNDWI (metadata only)
+    - cloud_free_fraction = 1.0 - (cloud_cover_pct / 100)
+  
+  DEM, Rainfall, Incidents (40%): SCAFFOLDING — No live data
+  
+  Confidence Label Mapping:
+    score >= 0.85  →  VERY_HIGH
+    score >= 0.70  →  HIGH
+    score >= 0.50  →  MEDIUM
+    score >= 0.30  →  LOW
+    else           →  VERY_LOW
+
+TEMPORAL FRAMES
+─────────────────────────────────────────────────────────────────────────────
+  Baseline:     window=metadata.baseline_window (e.g., "2025-06-01 to 2025-09-30")
+                Used for Sentinel-1 baseline median image
+  
+  Event:        window=metadata.event_window (e.g., "2026-01-01 to 2026-02-28")
+                Used for Sentinel-1 event median image
+  
+  Change:       DERIVED: baseline_start → event_end
+                Used for flood product (change = event - baseline)
+  
+  Progression:  Alternative event_window candidates from metadata
+                (if event_window_candidates array present)
+
+KNOWN LIMITATIONS
+─────────────────────────────────────────────────────────────────────────────
+  ❌ Live EE disabled by default (flag unset in .env)
+  ❌ Tasks lost on restart (no Firestore/BigQuery persistence)
+  ❌ Fusion is metadata-only (no real-time S2, DEM, rainfall queries)
+  ❌ Fixed temporal windows (no adaptive cloud-driven retry)
+  ❌ Tile fetch timeout 12s (no persistent cache or CDN)
+  ❌ No multi-temporal historical stack (only baseline vs event)
+  ❌ Sentinel-2 never queried (all fields are placeholders)
+
+DEPLOYMENT
+─────────────────────────────────────────────────────────────────────────────
+  To Enable Live EE:
+    1. Set environment variable: HAWKEYE_ENABLE_EE_LIVE_TILES=true
+    2. Ensure earthengine CLI authenticated: earthengine authenticate
+    3. Verify GCP_PROJECT_ID set in .env
+    4. Verify service account has EE API access
+  
+  Default (Recommended for Initial Deploy):
+    • Leave HAWKEYE_ENABLE_EE_LIVE_TILES unset
+    • System operates in offline mode (100% reliable)
+    • Placeholder tiles render as gray underlay
+    • All functionality available except live MapID generation
+
+TOP 5 IMPROVEMENTS (Priority Order)
+─────────────────────────────────────────────────────────────────────────────
+  #1 Enable Live EE + Task Persistence
+     Problem: Tiles disabled; tasks ephemeral
+     Effort: 4h
+     Impact: Operational SAR tiles + state persistence
+  
+  #2 Real-Time S1 + S2 Fusion
+     Problem: Sentinel-2 is placeholder
+     Effort: 6h
+     Impact: +30-40% confidence lift
+  
+  #3 Adaptive Temporal Window & Cloud Retry
+     Problem: Fixed windows fail on cloud cover
+     Effort: 8h
+     Impact: 50% error reduction
+  
+  #4 Tile Cache & CDN
+     Problem: 12s per tile, no cache
+     Effort: 4h
+     Impact: 80% hit rate, <100ms response
+  
+  #5 Historical Replay & Time-Series
+     Problem: Only baseline vs event
+     Effort: 10h
+     Impact: Timeline reconstruction, peak validation
+
+FILES MODIFIED FOR LIVE EE
+─────────────────────────────────────────────────────────────────────────────
+  Backend Service:
+    app/services/earth_engine_service.py (2412 lines)
+      └─ _build_live_runtime_tile_handles() [1019]
+      └─ _build_live_analysis_runtime_payload() [1179]
+      └─ get_runtime_multisensor_fusion() [1443]
+  
+  REST API:
+    app/main.py
+      └─ get_offline_earth_engine_tile() [1560]
+      └─ get_live_earth_engine_tile() [1589]
+      └─ run_live_earth_engine_analysis() [1654]
+      └─ ee_update broadcast [1047]
+  
+  Frontend UI:
+    frontend/src/components/EarthEnginePanel.jsx (744 lines)
+    frontend/src/components/strategic/DataLayerPanel.jsx (3125 lines)
+    frontend/src/components/CesiumGlobe.jsx (1122 lines)
+  
+  Data:
+    data/geojson/flood_extent.geojson (computed via PWTT algorithm)
+    data/geojson/analysis_provenance.json (metadata)
+
+TESTING CHECKLIST
+─────────────────────────────────────────────────────────────────────────────
+  □ Offline mode works (HAWKEYE_ENABLE_EE_LIVE_TILES unset)
+    - Placeholder tiles render on map
+    - No errors in console
+    - GeoJSON overlay visible
+  
+  □ Live mode works (HAWKEYE_ENABLE_EE_LIVE_TILES=true)
+    - POST /api/earth-engine/live-analysis returns task_id
+    - Task state transitions: queued → running → complete
+    - Live tile handles registered in service._live_tile_registry
+    - GET /api/earth-engine/tiles/live/{handle}/{z}/{x}/{y}.png returns PNG
+  
+  □ WebSocket broadcast
+    - ee_update message received with correct temporal_frames
+    - multisensor_fusion aggregate_confidence populated
+    - live_tile_status accurate
+  
+  □ Frontend rendering
+    - EarthEnginePanel displays fusion confidence
+    - Temporal slider works (baseline → event → change)
+    - Cesium renders tiles from both live and offline endpoints
+
+QUOTA MONITORING
+─────────────────────────────────────────────────────────────────────────────
+  Earth Engine default quota: 10,000 image tasks/day
+  
+  Cost per operation (estimate):
+    - image.getMapId() + tile fetch: ~100 tasks/1000 tiles
+    - Sentinel-1 ImageCollection query: ~1 task/analysis
+    - Export to BigQuery: ~10 tasks/export
+  
+  Monitoring:
+    - Check GCP Console: Earth Engine quota usage
+    - Set alerts for quota >80%
+    - Cache tiles aggressively to reduce requests
+
+═══════════════════════════════════════════════════════════════════════════════
+Generated: 2025-03-16
+Audit Scope: app/services/earth_engine_service.py, app/main.py, frontend components
+═══════════════════════════════════════════════════════════════════════════════

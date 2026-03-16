@@ -1,0 +1,222 @@
+/* ─────────────────────────────────────────────────────────────
+   HUD Tactical Overlay — CSS-only command center decoration
+   Positioned absolute over the Cesium globe container.
+   pointer-events: none ensures no interference with globe mouse.
+   ───────────────────────────────────────────────────────────── */
+
+.hud-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+  font-family: var(--font-mono);
+  color: var(--accent);
+  overflow: hidden;
+}
+
+/* ── Corner Brackets ─────────────────────────────────────── */
+.hud-corner {
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  border-color: var(--accent);
+  border-style: solid;
+  border-width: 0;
+  opacity: 0.6;
+}
+
+.hud-corner--tl {
+  top: 6px; left: 6px;
+  border-top-width: 2px;
+  border-left-width: 2px;
+}
+
+.hud-corner--tr {
+  top: 6px; right: 6px;
+  border-top-width: 2px;
+  border-right-width: 2px;
+}
+
+.hud-corner--bl {
+  bottom: 6px; left: 6px;
+  border-bottom-width: 2px;
+  border-left-width: 2px;
+}
+
+.hud-corner--br {
+  bottom: 6px; right: 6px;
+  border-bottom-width: 2px;
+  border-right-width: 2px;
+}
+
+/* ── Top Bar: Compass + Alt + Coords ─────────────────────── */
+.hud-top-bar {
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 10px;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+}
+
+.hud-compass {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  border: 1px solid rgba(0, 212, 255, 0.3);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.hud-compass-needle {
+  position: absolute;
+  width: 2px;
+  height: 14px;
+  top: 4px;
+  left: 50%;
+  margin-left: -1px;
+  background: linear-gradient(to bottom, var(--critical) 50%, rgba(0, 212, 255, 0.4) 50%);
+  transform-origin: bottom center;
+  transition: transform 0.15s ease-out;
+}
+
+.hud-compass-label {
+  font-size: 7px;
+  font-weight: 700;
+  color: rgba(0, 212, 255, 0.7);
+}
+
+.hud-altitude,
+.hud-coords {
+  color: rgba(0, 212, 255, 0.75);
+  white-space: nowrap;
+}
+
+.hud-altitude-value,
+.hud-coords-value {
+  color: var(--text-primary);
+  margin-left: 4px;
+  font-weight: 600;
+}
+
+/* ── Top Right: REC + Timestamp + Duration ───────────────── */
+.hud-top-right {
+  position: absolute;
+  top: 8px;
+  right: 42px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 3px;
+  font-size: 9px;
+  letter-spacing: 1px;
+}
+
+.hud-rec {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--critical);
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+}
+
+.hud-rec-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--critical);
+  animation: hud-rec-blink 1s ease-in-out infinite;
+}
+
+@keyframes hud-rec-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.15; }
+}
+
+.hud-timestamp {
+  color: rgba(0, 212, 255, 0.6);
+  font-size: 9px;
+}
+
+.hud-duration {
+  color: rgba(0, 212, 255, 0.45);
+  font-size: 8px;
+}
+
+/* ── Bottom Status Bar ───────────────────────────────────── */
+.hud-bottom-bar {
+  position: absolute;
+  bottom: 6px;
+  left: 40px;
+  right: 40px;
+  display: flex;
+  justify-content: center;
+  font-size: 8px;
+  letter-spacing: 1.5px;
+  color: rgba(0, 212, 255, 0.35);
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Camera Mode Badge ───────────────────────────────────── */
+.hud-camera-badge {
+  position: absolute;
+  bottom: 24px;
+  right: 12px;
+  padding: 3px 8px;
+  border: 1px solid rgba(0, 212, 255, 0.25);
+  border-radius: 2px;
+  background: rgba(10, 14, 23, 0.75);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: var(--accent);
+  text-transform: uppercase;
+}
+
+/* ── Scanline CRT Effect ─────────────────────────────────── */
+.hud-scanlines {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent,
+    transparent 3px,
+    rgba(0, 212, 255, 0.025) 3px,
+    rgba(0, 212, 255, 0.025) 4px
+  );
+  pointer-events: none;
+  z-index: 6;
+}
+
+/* ── Thin crosshair lines (center of viewport) ───────────── */
+.hud-crosshair-h,
+.hud-crosshair-v {
+  position: absolute;
+  background: rgba(0, 212, 255, 0.08);
+}
+
+.hud-crosshair-h {
+  top: 50%;
+  left: 40px;
+  right: 40px;
+  height: 1px;
+}
+
+.hud-crosshair-v {
+  left: 50%;
+  top: 40px;
+  bottom: 40px;
+  width: 1px;
+}

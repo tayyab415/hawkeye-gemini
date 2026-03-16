@@ -1,0 +1,1140 @@
+/* ─────────────────────────────────────────────────────────────
+   Analytics Dashboard — Gotham-grade chart styling
+   Palantir-inspired: dark, dense, functional, surgical precision
+   ───────────────────────────────────────────────────────────── */
+
+/* ── Tab Bar ──────────────────────────────────────────────── */
+
+.analytics-tab-bar {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  background: linear-gradient(180deg, rgba(10, 14, 23, 0.6) 0%, rgba(10, 14, 23, 0.3) 100%);
+}
+
+.analytics-tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 7px 12px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: var(--font-display);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  position: relative;
+  transition: color 0.2s, background 0.2s;
+}
+
+.analytics-tab:first-child {
+  border-right: 1px solid rgba(30, 45, 61, 0.5);
+}
+
+.analytics-tab:hover {
+  color: var(--text-primary);
+  background: rgba(0, 212, 255, 0.03);
+}
+
+.analytics-tab--active {
+  color: var(--accent);
+  background: rgba(0, 212, 255, 0.05);
+}
+
+.analytics-tab--active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--accent);
+  box-shadow: 0 0 12px rgba(0, 212, 255, 0.5), 0 0 4px rgba(0, 212, 255, 0.3);
+}
+
+.analytics-tab-icon {
+  font-size: 7px;
+  opacity: 0.5;
+  line-height: 1;
+}
+
+.analytics-tab--active .analytics-tab-icon {
+  opacity: 1;
+  color: var(--accent);
+}
+
+/* Pulsing dot — unseen chart data on inactive tab */
+.analytics-tab-indicator {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: tabIndicatorPulse 1.5s infinite;
+  flex-shrink: 0;
+}
+
+@keyframes tabIndicatorPulse {
+  0%, 100% { opacity: 1; box-shadow: 0 0 6px rgba(0, 212, 255, 0.7); }
+  50% { opacity: 0.3; box-shadow: 0 0 0 rgba(0, 212, 255, 0); }
+}
+
+.analytics-tab-count {
+  padding: 1px 5px;
+  background: rgba(0, 212, 255, 0.12);
+  border: 1px solid rgba(0, 212, 255, 0.15);
+  border-radius: 8px;
+  font-size: 8px;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.3;
+}
+
+/* ── Tab Content ─────────────────────────────────────────── */
+
+.analytics-tab-content {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 0; /* critical: allows flex children to scroll */
+}
+
+/* ── Container ────────────────────────────────────────────── */
+
+.analytics-dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  height: 100%;
+  overflow-y: auto;
+  padding: 8px 12px;
+}
+
+.analytics-dashboard::-webkit-scrollbar {
+  width: 4px;
+}
+
+.analytics-dashboard::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.analytics-dashboard::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 2px;
+}
+
+/* ── Subsection Label ────────────────────────────────────── */
+
+.analytics-subsection-label {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+  padding-left: 11px;
+  position: relative;
+}
+
+.analytics-subsection-label::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 4px;
+  background: rgba(0, 212, 255, 0.3);
+  border-radius: 1px;
+}
+
+/* ── Panel Sections ───────────────────────────────────────── */
+
+.analytics-section {
+  background: rgba(10, 14, 23, 0.65);
+  border: 1px solid rgba(0, 212, 255, 0.08);
+  border-radius: 3px;
+  padding: 10px;
+  animation: sectionFadeIn 0.4s ease-out both;
+  position: relative;
+  transition: border-color 0.5s, box-shadow 0.5s;
+}
+
+/* Glow pulse when data first arrives */
+.analytics-section.data-fresh {
+  border-color: rgba(0, 212, 255, 0.25);
+  box-shadow: 0 0 15px rgba(0, 212, 255, 0.08), inset 0 0 15px rgba(0, 212, 255, 0.03);
+}
+
+/* Top edge highlight on each section */
+.analytics-section::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: 10%;
+  right: 10%;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(0, 212, 255, 0.15) 50%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+.analytics-section + .analytics-section {
+  margin-top: 2px;
+}
+
+@keyframes sectionFadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.analytics-section-header {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: rgba(0, 212, 255, 0.85);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  line-height: 1;
+  text-shadow: 0 0 8px rgba(0, 212, 255, 0.15);
+}
+
+.analytics-section-header::before {
+  content: '';
+  display: inline-block;
+  width: 3px;
+  height: 10px;
+  background: var(--accent);
+  border-radius: 1px;
+  flex-shrink: 0;
+  box-shadow: 0 0 6px rgba(0, 212, 255, 0.4);
+}
+
+/* ── Badges ───────────────────────────────────────────────── */
+
+.chart-badge {
+  padding: 2px 7px;
+  border-radius: 2px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.5px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+
+.chart-badge--cyan {
+  background: rgba(0, 212, 255, 0.12);
+  color: #00d4ff;
+  border: 1px solid rgba(0, 212, 255, 0.2);
+}
+
+.chart-badge--red {
+  background: rgba(255, 50, 50, 0.1);
+  color: #ff4444;
+  border: 1px solid rgba(255, 50, 50, 0.2);
+}
+
+.chart-badge--orange {
+  background: rgba(255, 136, 0, 0.1);
+  color: #ff8800;
+  border: 1px solid rgba(255, 136, 0, 0.2);
+}
+
+.chart-badge--green {
+  background: rgba(0, 255, 136, 0.1);
+  color: #00ff88;
+  border: 1px solid rgba(0, 255, 136, 0.2);
+}
+
+/* ── Recharts Overrides ───────────────────────────────────── */
+
+.analytics-section .recharts-cartesian-grid line {
+  stroke: rgba(255, 255, 255, 0.04);
+}
+
+.analytics-section .recharts-tooltip-wrapper {
+  pointer-events: none;
+}
+
+/* ── Cascade Flow Chart ───────────────────────────────────── */
+
+.cascade-flow {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.cascade-order {
+  border-left: 3px solid;
+  padding: 7px 10px;
+  background: rgba(255, 255, 255, 0.015);
+  border-radius: 0 3px 3px 0;
+  animation: cascadeSlideIn 0.35s ease-out both;
+  position: relative;
+  overflow: hidden;
+  transition: background 0.2s;
+}
+
+.cascade-order:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.cascade-order::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.02) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.cascade-order:nth-child(1) { border-color: #00d4ff; animation-delay: 0s; }
+.cascade-order:nth-child(2) { border-color: #ffcc00; animation-delay: 0.25s; }
+.cascade-order:nth-child(3) { border-color: #ff8800; animation-delay: 0.5s; }
+.cascade-order:nth-child(4) { border-color: #ff3333; animation-delay: 0.75s; }
+
+.cascade-order-label {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.cascade-order-label .cascade-icon {
+  font-size: 10px;
+  opacity: 0.7;
+}
+
+.cascade-order:nth-child(1) .cascade-order-label { color: rgba(0, 212, 255, 0.7); }
+.cascade-order:nth-child(2) .cascade-order-label { color: rgba(255, 204, 0, 0.7); }
+.cascade-order:nth-child(3) .cascade-order-label { color: rgba(255, 136, 0, 0.7); }
+.cascade-order:nth-child(4) .cascade-order-label { color: rgba(255, 51, 51, 0.7); }
+
+.cascade-stat-row {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 1px 0;
+}
+
+.cascade-stat-marker {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 3px;
+}
+
+.cascade-order:nth-child(1) .cascade-stat-marker { background: #00d4ff; }
+.cascade-order:nth-child(2) .cascade-stat-marker { background: #ffcc00; }
+.cascade-order:nth-child(3) .cascade-stat-marker { background: #ff8800; }
+.cascade-order:nth-child(4) .cascade-stat-marker { background: #ff3333; }
+
+.cascade-stat-text {
+  font-size: 11px;
+  color: var(--text-primary);
+  line-height: 1.35;
+}
+
+.cascade-stat-text strong {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: #e8f0ff;
+  font-variant-numeric: tabular-nums;
+}
+
+@keyframes cascadeSlideIn {
+  from { opacity: 0; transform: translateX(-12px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* ── Infrastructure Risk Chart ────────────────────────────── */
+
+.infra-risk-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+}
+
+.infra-risk-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  background: rgba(255, 255, 255, 0.015);
+  border-radius: 3px;
+  border-left: 2px solid;
+  animation: infraFadeIn 0.3s ease-out both;
+  transition: background 0.2s, box-shadow 0.2s;
+}
+
+.infra-risk-item:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.infra-risk-item:nth-child(1) { border-color: #ff3333; animation-delay: 0.1s; }
+.infra-risk-item:nth-child(2) { border-color: #ffcc00; animation-delay: 0.2s; }
+.infra-risk-item:nth-child(3) { border-color: #ff8800; animation-delay: 0.3s; }
+.infra-risk-item:nth-child(4) { border-color: #00ff88; animation-delay: 0.4s; }
+
+.infra-risk-item:nth-child(1):hover { box-shadow: inset 0 0 15px rgba(255, 51, 51, 0.05); }
+.infra-risk-item:nth-child(2):hover { box-shadow: inset 0 0 15px rgba(255, 204, 0, 0.05); }
+.infra-risk-item:nth-child(3):hover { box-shadow: inset 0 0 15px rgba(255, 136, 0, 0.05); }
+.infra-risk-item:nth-child(4):hover { box-shadow: inset 0 0 15px rgba(0, 255, 136, 0.05); }
+
+@keyframes infraFadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.infra-risk-icon {
+  font-size: 14px;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.infra-risk-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.infra-risk-label {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.infra-risk-value {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.infra-risk-delta {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 600;
+  padding: 1px 5px;
+  border-radius: 2px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.infra-risk-delta--up {
+  color: #ff4444;
+  background: rgba(255, 68, 68, 0.12);
+}
+
+.infra-risk-delta--same {
+  color: var(--text-secondary);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+/* ── Vulnerability Ranking ────────────────────────────────── */
+
+.vuln-ranking-list {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.vuln-ranking-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+  animation: vulnSlideIn 0.3s ease-out both;
+}
+
+.vuln-ranking-row:nth-child(1) { animation-delay: 0.05s; }
+.vuln-ranking-row:nth-child(2) { animation-delay: 0.1s; }
+.vuln-ranking-row:nth-child(3) { animation-delay: 0.15s; }
+.vuln-ranking-row:nth-child(4) { animation-delay: 0.2s; }
+.vuln-ranking-row:nth-child(5) { animation-delay: 0.25s; }
+.vuln-ranking-row:nth-child(6) { animation-delay: 0.3s; }
+.vuln-ranking-row:nth-child(7) { animation-delay: 0.35s; }
+.vuln-ranking-row:nth-child(8) { animation-delay: 0.4s; }
+
+@keyframes vulnSlideIn {
+  from { opacity: 0; transform: translateX(8px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.vuln-ranking-rank {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--text-secondary);
+  width: 14px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.vuln-ranking-name {
+  font-size: 10px;
+  color: var(--text-primary);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.vuln-ranking-bar-track {
+  width: 80px;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 3px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.vuln-ranking-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  background: linear-gradient(90deg, #ff3333, #ff6644);
+}
+
+.vuln-ranking-count {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: #ff6644;
+  width: 36px;
+  text-align: right;
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── SAR Provenance + Transcript Mirror ───────────────────── */
+
+.sar-provenance-card {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px 12px;
+  padding: 8px 0;
+}
+
+.sar-provenance-item {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.sar-provenance-label {
+  font-family: var(--font-mono);
+  font-size: 7px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.sar-provenance-value {
+  font-size: 10px;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.transcript-mirror {
+  min-height: 48px;
+  max-height: 120px;
+  overflow-y: auto;
+  padding: 8px 0 0;
+  border-top: 1px solid rgba(0, 212, 255, 0.08);
+}
+
+.transcript-mirror::-webkit-scrollbar {
+  width: 3px;
+}
+
+.transcript-mirror::-webkit-scrollbar-thumb {
+  background: rgba(0, 212, 255, 0.15);
+  border-radius: 2px;
+}
+
+.transcript-mirror-text {
+  font-size: 13px;
+  color: rgba(224, 230, 237, 0.9);
+  line-height: 1.5;
+  letter-spacing: 0.2px;
+}
+
+.transcript-mirror-empty {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: rgba(0, 212, 255, 0.2);
+  text-transform: uppercase;
+  text-align: center;
+  padding: 18px 0;
+}
+
+/* ── Recharts Tooltip Override ─────────────────────────────── */
+
+.chart-tooltip {
+  background: rgba(10, 14, 23, 0.95) !important;
+  border: 1px solid rgba(0, 212, 255, 0.25) !important;
+  border-radius: 3px !important;
+  padding: 6px 10px !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(8px);
+}
+
+.chart-tooltip-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--text-secondary);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+
+.chart-tooltip-value {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: #00d4ff;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Empty State (BigQuery tab) ───────────────────────────── */
+
+.chart-empty-state {
+  padding: 16px 0;
+  text-align: center;
+}
+
+.chart-empty-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: rgba(0, 212, 255, 0.18);
+  text-transform: uppercase;
+}
+
+.analytics-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 48px 24px;
+  text-align: center;
+  animation: sectionFadeIn 0.5s ease-out both;
+  position: relative;
+}
+
+/* Subtle radial glow behind the empty state */
+.analytics-empty-state::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(0, 212, 255, 0.03) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.analytics-empty-icon {
+  font-size: 24px;
+  color: rgba(0, 212, 255, 0.12);
+  line-height: 1;
+}
+
+.analytics-empty-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  width: 48px;
+  opacity: 0.15;
+}
+
+.analytics-empty-cell {
+  width: 22px;
+  height: 14px;
+  border: 1px solid rgba(0, 212, 255, 0.3);
+  border-radius: 2px;
+  background: rgba(0, 212, 255, 0.04);
+}
+
+.analytics-empty-title {
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: rgba(0, 212, 255, 0.25);
+}
+
+.analytics-empty-text {
+  font-size: 11px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  max-width: 240px;
+  opacity: 0.6;
+}
+
+.analytics-empty-hint {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.5px;
+  color: rgba(0, 212, 255, 0.2);
+  padding: 6px 12px;
+  border: 1px dashed rgba(0, 212, 255, 0.1);
+  border-radius: 3px;
+  margin-top: 4px;
+}
+
+/* ── Responsive ───────────────────────────────────────────── */
+
+@media (max-width: 1280px) {
+  .infra-risk-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .vuln-ranking-bar-track {
+    width: 60px;
+  }
+}
+
+/* ── PointIntelCard ────────────────────────────────────────── */
+
+/* ── Viewport-Scoped Number Transitions ───────────────────── */
+
+.viewport-num-transition {
+  animation: vpNumPop 0.35s ease-out;
+}
+
+@keyframes vpNumPop {
+  0%   { opacity: 0.3; transform: scale(0.85); }
+  60%  { opacity: 1;   transform: scale(1.08); }
+  100% { opacity: 1;   transform: scale(1); }
+}
+
+.viewport-scope-tag {
+  font-size: 7px !important;
+  padding: 1px 4px !important;
+  opacity: 0.7;
+  letter-spacing: 0.5px;
+}
+
+.viewport-scope-inline {
+  font-family: var(--font-mono);
+  font-size: 7px;
+  letter-spacing: 1px;
+  color: var(--accent);
+  opacity: 0.6;
+  margin-left: 6px;
+  font-weight: 400;
+}
+
+/* ── PointIntelCard / Viewport Analysis ───────────────────── */
+
+.point-intel-card {
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.06) 0%, rgba(10, 14, 23, 0.95) 100%);
+  border: 1px solid rgba(0, 212, 255, 0.2);
+  border-radius: 4px;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+  animation: point-intel-enter 0.4s ease-out;
+  position: relative;
+  overflow: hidden;
+}
+
+.point-intel-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  opacity: 0.6;
+}
+
+@keyframes point-intel-enter {
+  from { opacity: 0; transform: translateY(-8px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.point-intel-card--loading {
+  border-color: rgba(0, 212, 255, 0.12);
+}
+
+.point-intel-card--refreshing {
+  border-color: rgba(0, 212, 255, 0.3);
+}
+
+.point-intel-card--error {
+  border-color: rgba(255, 68, 68, 0.25);
+  background: linear-gradient(135deg, rgba(255, 68, 68, 0.06) 0%, rgba(10, 14, 23, 0.95) 100%);
+}
+
+.point-intel-card--error::before {
+  background: linear-gradient(90deg, transparent, var(--critical), transparent);
+}
+
+/* Scan line that sweeps across during refresh */
+.point-intel-scan-line {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.04), transparent);
+  animation: vpScanSweep 1.5s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+
+@keyframes vpScanSweep {
+  0%   { left: -60%; }
+  100% { left: 100%; }
+}
+
+.point-intel-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.point-intel-icon {
+  color: var(--accent);
+  font-size: 11px;
+  animation: point-icon-pulse 2s ease-in-out infinite;
+}
+
+@keyframes point-icon-pulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+.point-intel-title {
+  font-family: var(--font-display);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--accent);
+}
+
+.vp-scope-badge {
+  font-family: var(--font-mono);
+  font-size: 7px;
+  letter-spacing: 1px;
+  color: var(--success);
+  background: rgba(0, 255, 136, 0.08);
+  border: 1px solid rgba(0, 255, 136, 0.15);
+  padding: 1px 5px;
+  border-radius: 2px;
+}
+
+.point-intel-coord {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--text-secondary);
+  margin-left: auto;
+  letter-spacing: 0.3px;
+}
+
+.point-intel-risk-badge {
+  font-family: var(--font-display);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  padding: 2px 6px;
+  border-radius: 2px;
+  border: 1px solid;
+  margin-left: 6px;
+  flex-shrink: 0;
+}
+
+/* Loading state */
+.point-intel-loading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0 4px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-secondary);
+  letter-spacing: 0.5px;
+}
+
+.point-intel-spinner {
+  width: 14px;
+  height: 14px;
+  border: 1.5px solid rgba(0, 212, 255, 0.15);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: point-spin 0.8s linear infinite;
+}
+
+@keyframes point-spin {
+  to { transform: rotate(360deg); }
+}
+
+.point-intel-error {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--critical);
+  padding: 4px 0;
+  opacity: 0.8;
+}
+
+/* ── Risk Level Bar ───────────────────────────────────────── */
+
+.vp-risk-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.vp-risk-level-bar {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.vp-risk-label {
+  font-family: var(--font-mono);
+  font-size: 7px;
+  letter-spacing: 1.5px;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+.vp-risk-level-track {
+  flex: 1;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 3px;
+  overflow: hidden;
+  position: relative;
+}
+
+.vp-risk-level-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+              background 0.4s,
+              box-shadow 0.4s;
+}
+
+/* ── Gauge Bars ───────────────────────────────────────────── */
+
+.vp-gauges {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.vp-gauge {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.vp-gauge-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.vp-gauge-label {
+  font-family: var(--font-mono);
+  font-size: 7px;
+  letter-spacing: 1.5px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+}
+
+.vp-gauge-value {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  transition: color 0.3s;
+}
+
+.vp-gauge-track {
+  height: 4px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 2px;
+  overflow: visible;
+  position: relative;
+}
+
+.vp-gauge-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  position: relative;
+}
+
+.vp-gauge-marker {
+  position: absolute;
+  top: -2px;
+  width: 2px;
+  height: 8px;
+  border-left: 2px solid;
+  transition: left 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  opacity: 0.7;
+}
+
+/* ── Last Event ───────────────────────────────────────────── */
+
+.vp-last-event {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0 6px;
+  border-top: 1px solid rgba(0, 212, 255, 0.06);
+}
+
+.vp-last-event-label {
+  font-family: var(--font-mono);
+  font-size: 7px;
+  letter-spacing: 1.5px;
+  color: var(--text-secondary);
+}
+
+.vp-last-event-value {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Infrastructure Section with Bars ─────────────────────── */
+
+.vp-infra-section {
+  border-top: 1px solid rgba(0, 212, 255, 0.08);
+  padding-top: 6px;
+}
+
+.vp-infra-header {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: 1px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.vp-infra-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.vp-infra-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  animation: vpInfraSlide 0.4s ease-out both;
+}
+
+.vp-infra-bar-row:nth-child(1) { animation-delay: 0.05s; }
+.vp-infra-bar-row:nth-child(2) { animation-delay: 0.1s; }
+.vp-infra-bar-row:nth-child(3) { animation-delay: 0.15s; }
+.vp-infra-bar-row:nth-child(4) { animation-delay: 0.2s; }
+
+@keyframes vpInfraSlide {
+  from { opacity: 0; transform: translateX(-6px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.vp-infra-bar-icon {
+  font-size: 11px;
+  flex-shrink: 0;
+  width: 16px;
+  text-align: center;
+}
+
+.vp-infra-bar-name {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: 0.5px;
+  color: var(--text-secondary);
+  width: 52px;
+  flex-shrink: 0;
+}
+
+.vp-infra-bar-track {
+  flex: 1;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.vp-infra-bar-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  min-width: 2px;
+}
+
+.vp-infra-bar-count {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  width: 24px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+/* Infrastructure names */
+.point-intel-names {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  margin-top: 3px;
+}
+
+.point-intel-name {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  color: var(--text-secondary);
+  opacity: 0.7;
+}
+
+.point-intel-name::before {
+  content: '\2022 ';
+  color: var(--accent);
+  opacity: 0.4;
+}

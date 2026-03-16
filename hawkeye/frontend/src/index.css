@@ -1,0 +1,35 @@
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #0a0e17;
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
+}
+
+/* Hide Cesium's default credit container styling clutter but keep credits visible */
+.cesium-viewer-bottom {
+  font-size: 10px !important;
+  opacity: 0.6;
+}
+
+/* Scrollbar styling for test panel */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #2a3a4e;
+  border-radius: 2px;
+}

@@ -1,0 +1,546 @@
+/* ================================================================
+   MissionSelect — Operation Theatre Selection Screen
+   Palantir Gotham dark aesthetic
+   ================================================================ */
+
+/* ── Full-screen overlay ────────────────────────────────────────── */
+.ms-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-base, #0a0e17);
+  overflow: hidden;
+}
+
+/* Atmospheric radial glow behind content */
+.ms-overlay::before {
+  content: '';
+  position: absolute;
+  width: 900px;
+  height: 900px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(0, 212, 255, 0.04) 0%,
+    rgba(0, 212, 255, 0.015) 40%,
+    transparent 70%
+  );
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+/* CRT scanlines */
+.ms-scanlines {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.03) 2px,
+    rgba(0, 0, 0, 0.03) 4px
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ── Container ──────────────────────────────────────────────────── */
+.ms-container {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 48px;
+  padding: 40px 24px;
+  animation: ms-containerIn 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes ms-containerIn {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ── Header ─────────────────────────────────────────────────────── */
+.ms-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.ms-logo-mark {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 4px;
+}
+
+.ms-diamond {
+  font-size: 48px;
+  color: var(--accent, #00d4ff);
+  line-height: 1;
+  filter: drop-shadow(0 0 18px rgba(0, 212, 255, 0.4));
+  animation: ms-diamondPulse 3s ease-in-out infinite;
+}
+
+.ms-diamond--echo {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.15;
+  filter: blur(6px) drop-shadow(0 0 30px rgba(0, 212, 255, 0.3));
+  animation: ms-echoPulse 3s ease-in-out infinite;
+}
+
+@keyframes ms-diamondPulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.05); opacity: 0.85; }
+}
+
+@keyframes ms-echoPulse {
+  0%, 100% { transform: scale(1); opacity: 0.15; }
+  50% { transform: scale(1.25); opacity: 0.25; }
+}
+
+.ms-title {
+  font-family: var(--font-display, 'Orbitron', sans-serif);
+  font-size: 42px;
+  font-weight: 900;
+  letter-spacing: 14px;
+  color: var(--text-primary, #e0e6ed);
+  margin: 0;
+  text-shadow: 0 0 40px rgba(0, 212, 255, 0.12);
+  text-indent: 14px; /* balance letter-spacing visual centering */
+}
+
+.ms-subtitle-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  max-width: 480px;
+}
+
+.ms-rule {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--border, #1e2d3d) 30%,
+    var(--border, #1e2d3d) 70%,
+    transparent
+  );
+}
+
+.ms-subtitle {
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 11px;
+  letter-spacing: 5px;
+  color: var(--text-secondary, #6b7b8d);
+  white-space: nowrap;
+  text-indent: 5px;
+}
+
+/* ── Cards container ────────────────────────────────────────────── */
+.ms-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  width: 100%;
+  max-width: 820px;
+}
+
+/* ── Card base ──────────────────────────────────────────────────── */
+.ms-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-panel, #1a2332);
+  border: 1px solid var(--border, #1e2d3d);
+  border-radius: 0;
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color 0.35s, box-shadow 0.35s, transform 0.35s;
+  text-align: left;
+  font-family: inherit;
+  padding: 0;
+  outline: none;
+  color: inherit;
+}
+
+.ms-card:focus-visible {
+  outline: 2px solid var(--accent, #00d4ff);
+  outline-offset: 2px;
+}
+
+/* ── Corner accents (tactical bracket corners) ──────────────────── */
+.ms-corner {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  pointer-events: none;
+  z-index: 3;
+  transition: opacity 0.3s;
+  opacity: 0.3;
+}
+
+.ms-card--hovered .ms-corner {
+  opacity: 0.8;
+}
+
+.ms-corner--tl {
+  top: 0; left: 0;
+  border-top: 1px solid var(--accent, #00d4ff);
+  border-left: 1px solid var(--accent, #00d4ff);
+}
+.ms-corner--tr {
+  top: 0; right: 0;
+  border-top: 1px solid var(--accent, #00d4ff);
+  border-right: 1px solid var(--accent, #00d4ff);
+}
+.ms-corner--bl {
+  bottom: 0; left: 0;
+  border-bottom: 1px solid var(--accent, #00d4ff);
+  border-left: 1px solid var(--accent, #00d4ff);
+}
+.ms-corner--br {
+  bottom: 0; right: 0;
+  border-bottom: 1px solid var(--accent, #00d4ff);
+  border-right: 1px solid var(--accent, #00d4ff);
+}
+
+/* ── Card graphic ───────────────────────────────────────────────── */
+.ms-card-graphic-wrap {
+  position: relative;
+  width: 100%;
+  height: 160px;
+  overflow: hidden;
+  background: var(--bg-panel-alt, #141c2b);
+}
+
+.ms-card-graphic {
+  width: 100%;
+  height: 100%;
+  display: block;
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.ms-card--hovered .ms-card-graphic {
+  transform: scale(1.08);
+}
+
+.ms-card-graphic-fade {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: linear-gradient(to top, var(--bg-panel, #1a2332), transparent);
+  pointer-events: none;
+}
+
+/* ── Card body ──────────────────────────────────────────────────── */
+.ms-card-body {
+  padding: 20px 22px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+}
+
+.ms-card-status {
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: fit-content;
+}
+
+.ms-card-status--live {
+  color: var(--success, #00ff88);
+}
+
+.ms-card-status--pending {
+  color: var(--text-secondary, #6b7b8d);
+}
+
+.ms-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.ms-card-status--live .ms-status-dot {
+  background: var(--success, #00ff88);
+  box-shadow: 0 0 8px rgba(0, 255, 136, 0.5);
+  animation: ms-dotPulse 2s ease-in-out infinite;
+}
+
+.ms-card-status--pending .ms-status-dot {
+  background: var(--text-secondary, #6b7b8d);
+}
+
+@keyframes ms-dotPulse {
+  0%, 100% { opacity: 1; box-shadow: 0 0 8px rgba(0, 255, 136, 0.5); }
+  50% { opacity: 0.4; box-shadow: 0 0 4px rgba(0, 255, 136, 0.2); }
+}
+
+.ms-card-title {
+  font-family: var(--font-display, 'Orbitron', sans-serif);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--text-primary, #e0e6ed);
+  margin: 0;
+  line-height: 1.35;
+  transition: color 0.3s;
+}
+
+.ms-card-desc {
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 11px;
+  line-height: 1.6;
+  color: var(--text-secondary, #6b7b8d);
+  margin: 0;
+}
+
+.ms-card-meta {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.ms-card-tag {
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  padding: 3px 8px;
+  border: 1px solid var(--border, #1e2d3d);
+  color: var(--text-secondary, #6b7b8d);
+  background: transparent;
+  transition: border-color 0.3s, color 0.3s;
+}
+
+/* ── Card action arrow / lock ───────────────────────────────────── */
+.ms-card-action {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 12px 22px 18px;
+}
+
+.ms-card-arrow {
+  font-size: 20px;
+  color: var(--accent, #00d4ff);
+  transition: transform 0.3s, opacity 0.3s;
+  opacity: 0.5;
+}
+
+.ms-card--hovered:not(.ms-card--disabled) .ms-card-arrow {
+  transform: translateX(4px);
+  opacity: 1;
+}
+
+.ms-card-action--locked {
+  color: var(--text-secondary, #6b7b8d);
+  opacity: 0.4;
+}
+
+/* ── Jakarta card hover ─────────────────────────────────────────── */
+.ms-card--jakarta.ms-card--hovered {
+  border-color: rgba(0, 212, 255, 0.35);
+  box-shadow:
+    0 0 40px rgba(0, 212, 255, 0.07),
+    inset 0 0 40px rgba(0, 212, 255, 0.02);
+  transform: translateY(-2px);
+}
+
+.ms-card--jakarta.ms-card--hovered .ms-card-title {
+  color: var(--accent, #00d4ff);
+}
+
+.ms-card--jakarta.ms-card--hovered .ms-card-tag {
+  border-color: rgba(0, 212, 255, 0.25);
+  color: rgba(0, 212, 255, 0.7);
+}
+
+/* Sweep highlight on hover */
+.ms-card--jakarta::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    110deg,
+    transparent 30%,
+    rgba(0, 212, 255, 0.03) 50%,
+    transparent 70%
+  );
+  opacity: 0;
+  transition: opacity 0.4s;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.ms-card--jakarta.ms-card--hovered::after {
+  opacity: 1;
+}
+
+/* ── Washington card hover ──────────────────────────────────────── */
+.ms-card--washington.ms-card--hovered {
+  border-color: rgba(10, 49, 97, 0.6);
+  box-shadow:
+    0 0 40px rgba(10, 49, 97, 0.12),
+    inset 0 0 40px rgba(10, 49, 97, 0.04);
+  transform: translateY(-2px);
+}
+
+.ms-card--washington.ms-card--hovered .ms-card-title {
+  color: #5b9bd5;
+}
+
+.ms-card--washington.ms-card--hovered .ms-card-tag {
+  border-color: rgba(91, 155, 213, 0.3);
+  color: rgba(91, 155, 213, 0.7);
+}
+
+.ms-card--washington::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    110deg,
+    transparent 30%,
+    rgba(10, 49, 97, 0.05) 50%,
+    transparent 70%
+  );
+  opacity: 0;
+  transition: opacity 0.4s;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.ms-card--washington.ms-card--hovered::after {
+  opacity: 1;
+}
+
+/* ── Preview badge ──────────────────────────────────────────────── */
+.ms-card-status--preview {
+  color: var(--warning, #ffaa00);
+}
+
+.ms-card-status--preview .ms-status-dot {
+  background: var(--warning, #ffaa00);
+  box-shadow: 0 0 8px rgba(255, 170, 0, 0.5);
+  animation: ms-dotPulseWarn 2s ease-in-out infinite;
+}
+
+@keyframes ms-dotPulseWarn {
+  0%, 100% { opacity: 1; box-shadow: 0 0 8px rgba(255, 170, 0, 0.5); }
+  50% { opacity: 0.4; box-shadow: 0 0 4px rgba(255, 170, 0, 0.2); }
+}
+
+/* ── Footer ─────────────────────────────────────────────────────── */
+.ms-footer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  animation: ms-footerIn 1s cubic-bezier(0.22, 1, 0.36, 1) 0.4s both;
+}
+
+@keyframes ms-footerIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.ms-footer-text {
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 9px;
+  letter-spacing: 3px;
+  color: var(--text-secondary, #6b7b8d);
+  opacity: 0.5;
+}
+
+.ms-footer-sep {
+  color: var(--text-secondary, #6b7b8d);
+  opacity: 0.25;
+  font-size: 8px;
+}
+
+/* ── Card stagger animation ─────────────────────────────────────── */
+.ms-card--jakarta {
+  animation: ms-cardIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both;
+}
+
+.ms-card--washington {
+  animation: ms-cardIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both;
+}
+
+@keyframes ms-cardIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── Responsive ─────────────────────────────────────────────────── */
+@media (max-width: 860px) {
+  .ms-cards {
+    grid-template-columns: 1fr;
+    max-width: 420px;
+  }
+
+  .ms-title {
+    font-size: 32px;
+    letter-spacing: 10px;
+    text-indent: 10px;
+  }
+
+  .ms-card-graphic-wrap {
+    height: 130px;
+  }
+}
+
+@media (max-width: 480px) {
+  .ms-title {
+    font-size: 24px;
+    letter-spacing: 6px;
+    text-indent: 6px;
+  }
+
+  .ms-subtitle {
+    font-size: 9px;
+    letter-spacing: 3px;
+  }
+
+  .ms-container {
+    gap: 32px;
+  }
+}

@@ -1,0 +1,29 @@
+[project]
+name = "hawkeye"
+version = "0.1.0"
+description = "Hawk Eye - Live Disaster Response Agent"
+requires-python = ">=3.11"
+dependencies = [
+    "google-adk>=0.1.0",
+    "google-genai>=1.0.0",
+    "google-cloud-bigquery>=3.0.0",
+    "google-cloud-firestore>=2.0.0",
+    "google-cloud-storage>=2.0.0",
+    "google-api-python-client>=2.100.0",
+    "google-auth>=2.23.0",
+    "earthengine-api>=0.1.0",
+    "fastapi>=0.100.0",
+    "uvicorn>=0.23.0",
+    "python-dotenv>=1.0.0",
+    "requests>=2.31.0",
+    "pyarrow>=14.0.0",
+    "googlemaps>=4.10.0",
+    "shapely>=2.0.0",
+    "pyproj>=3.6.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
+]

@@ -1,0 +1,132 @@
+.recon-viewport {
+  flex: 1;
+  background: #0d1117;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.recon-frame {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  animation: fadeInFrame 0.5s ease-in-out;
+}
+
+@keyframes fadeInFrame {
+  from { opacity: 0.5; }
+  to { opacity: 1; }
+}
+
+.recon-frame.prediction-pulse {
+  animation: pulse-pred 2s infinite, fadeInFrame 0.5s ease-in-out;
+  border: 2px solid var(--critical);
+  box-sizing: border-box;
+}
+
+@keyframes pulse-pred {
+  0%, 100% { border-color: var(--critical); }
+  50% { border-color: rgba(255, 68, 68, 0.2); }
+}
+
+.recon-prediction-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: var(--critical);
+  font-family: var(--font-mono);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  text-shadow: 0 0 10px rgba(0,0,0,0.8);
+  pointer-events: none;
+  background: rgba(0,0,0,0.5);
+  padding: 8px 16px;
+  border: 1px solid var(--critical);
+}
+
+.recon-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.recon-icon {
+  font-size: 32px;
+  color: rgba(0, 212, 255, 0.2);
+}
+
+.recon-placeholder-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: rgba(0, 212, 255, 0.35);
+}
+
+.recon-placeholder-sub {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 1px;
+  color: var(--text-secondary);
+}
+
+.recon-overlay-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-family: var(--font-mono);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  padding: 2px 8px;
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid var(--accent);
+  color: var(--accent);
+}
+
+.recon-modes {
+  display: flex;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.recon-mode-btn {
+  flex: 1;
+  background: transparent;
+  border: none;
+  border-right: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  padding: 8px 0;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.recon-mode-btn:last-child {
+  border-right: none;
+}
+
+.recon-mode-btn:hover {
+  color: var(--accent);
+  background: var(--accent-dim);
+}
+
+.recon-mode-btn.active {
+  color: var(--accent);
+  background: var(--accent-dim);
+  border-bottom: 2px solid var(--accent);
+}
+
+.recon-ts {
+  font-size: 9px;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}

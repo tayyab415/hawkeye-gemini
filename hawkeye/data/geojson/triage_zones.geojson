@@ -1,0 +1,354 @@
+{
+  "type": "FeatureCollection",
+  "name": "Jakarta Flood Triage Zones",
+  "description": "15 RED/YELLOW/GREEN triage zones covering Jakarta metro area for disaster response",
+  "created": "2026-03-15",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "zone": "RED",
+        "name": "Kampung Melayu",
+        "risk_level": "CRITICAL",
+        "population_estimate": 85000,
+        "shelters_nearby": 2,
+        "max_elevation_m": 7,
+        "description": "Lowest point along Ciliwung River. Historically worst-hit area in every major Jakarta flood.",
+        "recommended_action": "Immediate evacuation when water reaches 3m"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [106.840, -6.242],
+          [106.860, -6.242],
+          [106.860, -6.222],
+          [106.840, -6.222],
+          [106.840, -6.242]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "zone": "RED",
+        "name": "Cawang",
+        "risk_level": "CRITICAL",
+        "population_estimate": 72000,
+        "shelters_nearby": 1,
+        "max_elevation_m": 8,
+        "description": "Confluence of Ciliwung River and Cawang canal. Severe flash-flood risk.",
+        "recommended_action": "Prepare for evacuation at 2.5m water level"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [106.855, -6.255],
+          [106.880, -6.255],
+          [106.880, -6.235],
+          [106.855, -6.235],
+          [106.855, -6.255]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "zone": "RED",
+        "name": "North Jakarta Coastal",
+        "risk_level": "CRITICAL",
+        "population_estimate": 120000,
+        "shelters_nearby": 3,
+        "max_elevation_m": 2,
+        "description": "Subsiding coastal zone, below sea level in parts. Tidal and river flood convergence.",
+        "recommended_action": "Mandatory evacuation at 2m combined water level"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [106.830, -6.130],
+          [106.890, -6.130],
+          [106.890, -6.100],
+          [106.830, -6.100],
+          [106.830, -6.130]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "zone": "RED",
+        "name": "Penjaringan / Pluit",
+        "risk_level": "HIGH",
+        "population_estimate": 95000,
+        "shelters_nearby": 2,
+        "max_elevation_m": 3,
+        "description": "Low-lying northwest coastal area. Pluit reservoir overflow risk.",
+        "recommended_action": "Evacuate when Pluit reservoir exceeds capacity"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [106.770, -6.130],
+          [106.830, -6.130],
+          [106.830, -6.100],
+          [106.770, -6.100],
+          [106.770, -6.130]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "zone": "YELLOW",
+        "name": "Tebet",
+        "risk_level": "MODERATE",
+        "population_estimate": 65000,
+        "shelters_nearby": 3,
+        "max_elevation_m": 14,
+        "description": "Moderate elevation south of Ciliwung. Overflows reach western blocks in major events.",
+        "recommended_action": "Alert residents when water reaches 4m"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [106.845, -6.228],
+          [106.870, -6.228],
+          [106.870, -6.208],
+          [106.845, -6.208],
+          [106.845, -6.228]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "zone": "YELLOW",
+        "name": "Matraman",
+        "risk_level": "MODERATE",
+        "population_estimate": 55000,
+        "shelters_nearby": 2,
+        "max_elevation_m": 16,
+        "description": "Transitional elevation east of central Jakarta. Staging area potential.",
+        "recommended_action": "Suitable for emergency staging area"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [106.865, -6.210],
+          [106.890, -6.210],
+          [106.890, -6.190],
+          [106.865, -6.190],
+          [106.865, -6.210]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "zone": "YELLOW",
+        "name": "Jatinegara",
+        "risk_level": "MODERATE",
+        "population_estimate": 78000,
+        "shelters_nearby": 2,
+        "max_elevation_m": 12,
+        "description": "East Jakarta low-middle zone along Ciliwung tributary. Prone to secondary flooding.",
+        "recommended_action": "Monitor canal levels; alert at 3.5m"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [106.870, -6.240],
+          [106.905, -6.240],
+          [106.905, -6.215],
+          [106.870, -6.215],
+          [106.870, -6.240]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "zone": "YELLOW",
+        "name": "Kemayoran",
+        "risk_level": "MODERATE",
+        "population_estimate": 68000,
+        "shelters_nearby": 3,
+        "max_elevation_m": 10,
+        "description": "Central-north Jakarta, moderate subsidence. Drainage bottleneck during heavy rain.",
+        "recommended_action": "Pre-position pumps; alert residents at 3m"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [106.840, -6.170],
+          [106.875, -6.170],
+          [106.875, -6.145],
+          [106.840, -6.145],
+          [106.840, -6.170]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "zone": "YELLOW",
+        "name": "Cengkareng",
+        "risk_level": "MODERATE",
+        "population_estimate": 90000,
+        "shelters_nearby": 2,
+        "max_elevation_m": 9,
+        "description": "Western Jakarta near Soekarno-Hatta corridor. Flash-flood risk from Angke River.",
+        "recommended_action": "Monitor Angke River; pre-alert airport logistics"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [106.710, -6.175],
+          [106.760, -6.175],
+          [106.760, -6.145],
+          [106.710, -6.145],
+          [106.710, -6.175]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "zone": "GREEN",
+        "name": "Menteng",
+        "risk_level": "LOW",
+        "population_estimate": 45000,
+        "shelters_nearby": 4,
+        "max_elevation_m": 26,
+        "description": "Elevated central Jakarta. Primary evacuation destination with multiple shelters.",
+        "recommended_action": "Primary evacuation shelter zone"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [106.820, -6.200],
+          [106.850, -6.200],
+          [106.850, -6.180],
+          [106.820, -6.180],
+          [106.820, -6.200]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "zone": "GREEN",
+        "name": "Kuningan",
+        "risk_level": "LOW",
+        "population_estimate": 38000,
+        "shelters_nearby": 3,
+        "max_elevation_m": 30,
+        "description": "Elevated commercial/embassy district south of Menteng. Hospital cluster nearby.",
+        "recommended_action": "Secondary evacuation zone, hospital access"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [106.810, -6.230],
+          [106.840, -6.230],
+          [106.840, -6.210],
+          [106.810, -6.210],
+          [106.810, -6.230]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "zone": "GREEN",
+        "name": "GBK Stadium",
+        "risk_level": "LOW",
+        "population_estimate": 0,
+        "shelters_nearby": 1,
+        "max_elevation_m": 24,
+        "description": "Gelora Bung Karno Stadium — designated mass evacuation center, capacity >50,000.",
+        "recommended_action": "Mass evacuation center, capacity >50,000",
+        "capacity": 50000
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [106.790, -6.220],
+          [106.810, -6.220],
+          [106.810, -6.200],
+          [106.790, -6.200],
+          [106.790, -6.220]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "zone": "GREEN",
+        "name": "South Jakarta Highlands",
+        "risk_level": "LOW",
+        "population_estimate": 52000,
+        "shelters_nearby": 3,
+        "max_elevation_m": 50,
+        "description": "Elevated southern districts (Jagakarsa, Pasar Minggu). Highest ground in Jakarta.",
+        "recommended_action": "Long-term shelter zone; medical staging"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [106.820, -6.310],
+          [106.870, -6.310],
+          [106.870, -6.275],
+          [106.820, -6.275],
+          [106.820, -6.310]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "zone": "GREEN",
+        "name": "UI Campus",
+        "risk_level": "LOW",
+        "population_estimate": 30000,
+        "shelters_nearby": 5,
+        "max_elevation_m": 45,
+        "description": "Universitas Indonesia campus at Depok border. Large open grounds for staging.",
+        "recommended_action": "University shelters and medical faculty triage"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [106.810, -6.375],
+          [106.840, -6.375],
+          [106.840, -6.350],
+          [106.810, -6.350],
+          [106.810, -6.375]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "zone": "GREEN",
+        "name": "East Jakarta Highlands",
+        "risk_level": "LOW",
+        "population_estimate": 60000,
+        "shelters_nearby": 2,
+        "max_elevation_m": 35,
+        "description": "Elevated eastern districts (Cipayung, Ciracas). Good road access for relief convoys.",
+        "recommended_action": "Relief supply staging; convoy marshalling area"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [106.880, -6.340],
+          [106.920, -6.340],
+          [106.920, -6.310],
+          [106.880, -6.310],
+          [106.880, -6.340]
+        ]]
+      }
+    }
+  ]
+}

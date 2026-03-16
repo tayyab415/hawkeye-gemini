@@ -1,0 +1,243 @@
+================================================================================
+ HAWKEYE EARTH ENGINE RUNTIME INTEGRATION AUDIT - EXECUTIVE SUMMARY
+================================================================================
+
+AUDIT SCOPE:
+- Map current end-to-end EE data flow (offline compute → runtime → frontend)
+- Identify real/live vs. static/mock components
+- Propose concrete "EE first-class runtime" contract with payload shapes
+- Provide prioritized Phase-1 implementation plan
+
+================================================================================
+ KEY FINDINGS
+================================================================================
+
+1. CURRENT STATE: HYBRID (Real Infrastructure + Static Geometry)
+   
+   LIVE COMPONENTS:
+   ✓ BigQuery infrastructure queries (get_infrastructure_at_risk)
+   ✓ BigQuery historical flood patterns (query_historical_floods)
+   ✓ WebSocket bidirectional agent communication
+   
+   STATIC/MOCK COMPONENTS:
+   ✗ Flood extent geometry (loaded from file: flood_extent.geojson)
+   ✗ Growth rate = HARDCODED 12% per hour (see line 102 of earth_engine_service.py)
+   ✗ Population density = HARDCODED 15,000/km² (see line 14 of earth_engine_service.py)
+   ✗ Provenance metadata (loaded from analysis_provenance.json)
+   ✗ No live raster/tile delivery (only static GeoJSON vectors)
+
+2. CRITICAL GAPS
+
+   Gap 1: No Live Raster/Tile Delivery
+   - Missing: SAR backscatter, NDWI water body, change detection heatmaps
+   - No TMS/XYZ tile endpoint for Cesium
+
+   Gap 2: Missing Provenance/Confidence Metadata
+   - No per-pixel confidence scores
+   - No scene acquisition details or quality metrics
+   - No data freshness indicators
+
+   Gap 3: No Live EE Computation API
+   - EarthEngineService only loads files, doesn't compute
+   - No parameter override capability (e.g., different threshold_db)
+   - No async task tracking
+
+   Gap 4: Incomplete WebSocket Contract
+   - ee_update event lacks structure; no raster references
+   - No explicit confidence breakdown
+
+   Gap 5: Frontend Tile Layer Management Missing
+   - No raster opacity/blend controls
+   - No layer composition (SAR + change + water)
+
+3. PHASE-1 DELIVERABLE: CONCRETE CONTRACT
+
+   Backend:
+   - POST /api/earth-engine/analyze → Submit analysis, return task_id (202)
+   - GET /api/earth-engine/tasks/{task_id} → Poll status + progress
+   - GET /api/earth-engine/tasks/{task_id}/result → Fetch final result
+   - GET /api/earth-engine/tiles/{task_id}/{layer}/{z}/{x}/{y}.png → Raster tiles
+
+   WebSocket:
+   - ee_analysis_start: { task_id, estimated_time_seconds }
+   - ee_analysis_update: { task_id, phase, progress_pct, message }
+   - ee_analysis_complete: { task_id, analysis_provenance, geometry, tiles, metrics }
+
+   Frontend:
+   - Add "Run Live Analysis" button to EarthEnginePanel
+   - Display progress bar with phase updates
+   - Render raster layers with opacity control
+   - Update provenance panel with task metadata
+
+================================================================================
+ IMPLEMENTATION PLAN (21 HOURS)
+================================================================================
+
+TIER 1: Backend Service & API (10 hours)
+  1. earth_engine_service.py (4h) - Add async live analysis methods
+  2. app/main.py (3h) - Add 3 new endpoints + WebSocket polling
+  3. analyst.py (1h) - Enhance get_flood_extent for live mode
+  4. Pydantic models (1h) - Type validation
+
+TIER 2: Frontend Events & UI (11 hours)
+  5. types/messages.js (1h) - Add message types
+  6. App.jsx (2h) - Add WebSocket event handlers
+  7. EarthEnginePanel.jsx (1.5h) - Add progress UI
+  8. DataLayerPanel.jsx (1.5h) - Raster layer management
+  9. CesiumGlobe.jsx (2h) - Tile rendering
+  10. Tests (4h) - Unit + integration
+
+================================================================================
+ KEY PAYLOAD SHAPES
+================================================================================
+
+POST /api/earth-engine/analyze Request:
+{
+  "analysis_type": "flood_extent",
+  "parameters": {
+    "baseline_window": ["2025-06-01", "2025-09-30"],
+    "event_window": ["2026-01-01", "2026-02-28"],
+    "threshold_db": -3.0,
+    "output_format": "geojson+tiles"
+  }
+}
+
+GET /api/earth-engine/tasks/{task_id}/result Response:
+{
+  "analysis_provenance": {
+    "task_id": "...",
+    "source_dataset": "COPERNICUS/S1_GRD",
+    "confidence": "MEDIUM",
+    "scene_acquisitions": [
+      { "date": "2025-06-04", "confidence": 0.95, "cloud_cover": 2.1 },
+      ...
+    ],
+    "pixel_confidence": { "high": 0.92, "medium": 0.065, "low": 0.015 }
+  },
+  "geometry": { "type": "FeatureCollection", "features": [...] },
+  "tiles": {
+    "change_detection": { "url": "...", "title": "SAR Change" },
+    "water_mask": { "url": "...", "title": "Water Body" },
+    "confidence": { "url": "...", "title": "Confidence" }
+  },
+  "metrics": {
+    "flood_area_sqkm": 1.56,
+    "population_at_risk": 23400,
+    "growth_rate_estimate": { "rate_pct_per_hour": 8.2, "confidence": 0.65 }
+  }
+}
+
+WebSocket ee_analysis_complete Event:
+{
+  "type": "ee_analysis_complete",
+  "task_id": "ee_task_20260315_abc123",
+  "analysis_provenance": { /* see above */ },
+  "geometry": { /* GeoJSON */ },
+  "tiles": { /* tile URLs */ },
+  "metrics": { /* computed values */ },
+  "map_actions": [
+    { "action": "add_raster_layer", "layer_id": "...", "url": "..." },
+    { "action": "add_geojson_layer", "layer_id": "...", "geojson": ... }
+  ]
+}
+
+================================================================================
+ FILE CHANGE SUMMARY (9 FILES)
+================================================================================
+
+TIER 1 (Backend):
+  1. app/services/earth_engine_service.py
+     + submit_flood_analysis() async method
+     + get_analysis_status() async method
+     + get_analysis_result() async method
+     + _generate_tile_urls() method
+
+  2. app/main.py
+     + POST /api/earth-engine/analyze endpoint
+     + GET /api/earth-engine/tasks/{task_id} endpoint
+     + GET /api/earth-engine/tasks/{task_id}/result endpoint
+     + GET /api/earth-engine/tiles/{task_id}/{layer}/{z}/{x}/{y}.png endpoint
+     + _poll_ee_task() background task for WebSocket
+
+  3. app/hawkeye_agent/tools/analyst.py
+     ~ Enhance get_flood_extent() with live_mode parameter
+
+TIER 2 (Frontend):
+  4. frontend/src/types/messages.js
+     + EE_ANALYSIS_START, EE_ANALYSIS_UPDATE, EE_ANALYSIS_COMPLETE types
+     + ADD_RASTER_LAYER, UPDATE_RASTER_OPACITY, REMOVE_RASTER_LAYER actions
+
+  5. frontend/src/App.jsx
+     + analysisInProgress, analysisProgress, analysisPhase state
+     + Event handlers for all 3 new message types
+
+  6. frontend/src/components/EarthEnginePanel.jsx
+     + "Run Live Analysis" button
+     + Progress bar display with phase
+
+  7. frontend/src/components/strategic/DataLayerPanel.jsx
+     + handleAddRasterLayer() method
+     + handleRemoveRasterLayer() method
+     + handleUpdateRasterOpacity() method
+
+  8. frontend/src/components/CesiumGlobe.jsx
+     + Raster tile layer rendering in command handler
+     + Opacity control for raster layers
+
+OPTIONAL:
+  9. Type validation models (Pydantic)
+
+================================================================================
+ SUCCESS CRITERIA
+================================================================================
+
+✓ "Run Live Analysis" button clickable in EarthEnginePanel
+✓ Analysis submitted to EE, task_id returned in 202 response
+✓ Frontend displays progress bar with phase updates every 5 seconds
+✓ Upon completion, WebSocket emits ee_analysis_complete with full payload
+✓ GeoJSON flood extent vectors rendered on Cesium globe
+✓ 3 raster layers (change, water, confidence) displayed with opacity slider
+✓ Provenance metadata updated with task completion time
+✓ Backward compatibility: static data used if EE service unavailable
+
+================================================================================
+ EFFORT ESTIMATE
+================================================================================
+
+Component               | Effort | Risk
+------------------------|--------|--------
+Service layer           | 4h     | Low (isolated)
+REST endpoints          | 3h     | Low (standard patterns)
+WebSocket polling       | 2h     | Medium (async/event handling)
+Frontend events         | 3h     | Low (state management)
+UI components           | 3h     | Low (React components)
+Tile rendering (Cesium) | 2h     | Medium (Cesium API)
+Type safety             | 1h     | None
+Tests                   | 4h     | Variable
+TOTAL                   | 21h    |
+
+================================================================================
+ NEXT STEPS
+================================================================================
+
+1. Review this audit with team
+2. Prioritize TIER-1 backend work (7 hours) for infrastructure setup
+3. Set up Earth Engine service account and client library
+4. Implement in order: Services → Endpoints → Event Handlers → UI
+5. Test async task polling with real EE API
+6. Add integration tests for full data flow
+7. Deploy and validate with live flood extent computation
+
+================================================================================
+ AUDIT COMPLETION
+================================================================================
+
+Full audit report written to: hawkeye/EE_RUNTIME_AUDIT.md (782 lines)
+
+To mark this audit as complete in a todo database:
+- If using SQLite: UPDATE todos SET status = 'done' WHERE id = 'audit-ee-runtime-contract';
+- If using Firestore: Update audit-ee-runtime-contract document with status='done'
+- If using other: Refer to your todo system's API
+
+AUDIT STATUS: ✓ COMPLETE
+Generated: 2026-03-15
